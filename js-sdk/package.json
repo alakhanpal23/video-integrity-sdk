@@ -1,0 +1,16 @@
+// package.json: Node.js package for js-sdk wrapper
+//
+// - Add dependencies as needed for new features
+// - Update scripts for test/build as needed
+{
+  "name": "video-integrity-sdk-js",
+  "version": "0.1.0",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "form-data": "^4.0.0"
+  },
+  "scripts": {
+    "test": "echo 'No tests yet' && exit 0"
+  }
+} 

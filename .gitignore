@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# FFmpeg outputs
+*.mp4
+*.mov
+
+# Sensitive files
+video_secrets.db
+test_video.mp4
+
+# VS Code
+.vscode/

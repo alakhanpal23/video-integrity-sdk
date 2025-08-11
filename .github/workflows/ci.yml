@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+      - name: Run Python tests
+        run: |
+          source .venv/bin/activate
+          pytest
+      - name: Build Docker image
+        run: docker build -t video-sdk .
+      - name: Run API container
+        run: |
+          docker run -d --name video-sdk-api -e VIDEO_SDK_MASTER_KEY=changeme -p 8000:8000 video-sdk
+          sleep 10
+      - name: Smoke test /verify
+        run: |
+          curl --fail --max-time 30 http://localhost:8000/docs
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install Node.js dependencies
+        run: |
+          cd js-sdk && npm install
+      - name: Run Node.js tests
+        run: |
+          cd js-sdk && npm test 
