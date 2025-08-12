@@ -1,0 +1,21 @@
+# Video Integrity SDK Configuration
+
+embed:
+  crf: 23                    # Default CRF for encoding (0-51, lower = better quality)
+  seed: null                 # Random seed for reproducibility
+  preset: null               # Attack simulation preset
+
+verify:
+  n_frames: 10               # Number of frames to sample for verification
+  profile: "balanced"        # Verification profile: strict/balanced/lenient
+  sample_strategy: "uniform" # Frame sampling: uniform/keyframes
+  export_artifacts: false    # Export BER CSV and plot
+
+api:
+  host: "0.0.0.0"           # API server host
+  port: 8000                # API server port
+  api_key: null             # API key for authentication (set via env: API_KEY)
+  cors_origins:             # Allowed CORS origins
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+  max_file_size_mb: 100     # Maximum upload file size in MB

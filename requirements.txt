@@ -6,3 +6,12 @@ ffmpeg-python
 numpy
 requests
 opencv-python
+tqdm
+matplotlib
+pydantic
+PyYAML
+prometheus-client
+pytest
+ruff
+black
+mypy

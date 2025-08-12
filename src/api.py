@@ -13,21 +13,47 @@ import os
 import uuid
 import tempfile
 import subprocess
+import base64
 import numpy as np
 import torch
 import cv2
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request
-from fastapi.responses import JSONResponse
-from typing import Dict
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request, Depends
+from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict, Optional
 from decoder import WatermarkDecoder
 from keys import get_secret
+from config import load_config, get_profile_thresholds
+from utils import save_ber_artifacts, format_summary, progress_wrapper, Timer
 import logging
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
 from video_analysis import analyze_frames
+from prometheus_client import Counter, Histogram, generate_latest
 import requests
 
-app = FastAPI()
+# Load configuration
+config = load_config()
+
+app = FastAPI(
+    title="Video Integrity SDK API",
+    description="Watermark embedding and verification for video integrity",
+    version="1.0.0"
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.api.cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+# Prometheus metrics
+REQUESTS_TOTAL = Counter("verify_requests_total", "Total verify requests", ["status"])
+VERIFY_LATENCY = Histogram("verify_latency_seconds", "Verify request latency")
+AVG_BER = Histogram("avg_ber", "Average BER distribution")
 
 # In-memory secret store: {upload_id: secret}
 SECRET_STORE: Dict[str, np.ndarray] = {}
@@ -44,34 +70,111 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
         response.headers["X-Request-ID"] = request_id
         return response
 
+class APIKeyMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if config.api.api_key and request.url.path not in ["/healthz", "/readyz", "/metrics", "/docs", "/openapi.json"]:
+            api_key = request.headers.get("x-api-key")
+            if api_key != config.api.api_key:
+                REQUESTS_TOTAL.labels(status="unauthorized").inc()
+                raise HTTPException(status_code=401, detail="Invalid API key")
+        return await call_next(request)
+
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(APIKeyMiddleware)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     duration = time.time() - start_time
+    
+    # Update metrics
+    if request.url.path == "/verify":
+        VERIFY_LATENCY.observe(duration)
+        
     logger.info(f"{request.method} {request.url.path} [{getattr(request.state, 'request_id', '-')}] {response.status_code} {duration:.3f}s")
     return response
+
+# Health endpoints
+@app.get("/healthz")
+async def health():
+    """Health check endpoint"""
+    return {"status": "healthy"}
+
+@app.get("/readyz")
+async def readiness():
+    """Readiness check - verify model can be loaded"""
+    try:
+        decoder = WatermarkDecoder(secret_len=32)
+        return {"status": "ready", "model_loaded": True}
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Not ready: {e}")
+
+@app.get("/metrics")
+async def metrics():
+    """Prometheus metrics endpoint"""
+    return PlainTextResponse(generate_latest(), media_type="text/plain")
+
+def validate_file_upload(file: UploadFile) -> None:
+    """Validate uploaded file"""
+    # Check content type
+    if not file.content_type or not file.content_type.startswith('video/'):
+        raise HTTPException(status_code=400, detail="File must be a video")
+    
+    # Check file size (approximate)
+    if hasattr(file.file, 'seek') and hasattr(file.file, 'tell'):
+        file.file.seek(0, 2)  # Seek to end
+        size = file.file.tell()
+        file.file.seek(0)  # Reset
+        if size > config.api.max_file_size_mb * 1024 * 1024:
+            raise HTTPException(status_code=413, detail=f"File too large (max {config.api.max_file_size_mb}MB)")
 
 @app.post("/verify")
 async def verify(
     file: UploadFile = File(...),
     video_id: str = Form(None),
     secret_hex: str = Form(None),
-    n_frames: int = Form(10)
+    n_frames: int = Form(10),
+    profile: str = Form("balanced"),
+    sample_strategy: str = Form("uniform"),
+    export_artifacts: bool = Form(False)
 ):
     """
     Upload a video and secret. Sample N frames, decode watermark, compute BER.
-    Returns: {"valid": bool, "ber": float}
+    
+    Args:
+        file: Video file to verify
+        video_id: Video ID for secret lookup (alternative to secret_hex)
+        secret_hex: Secret as hex string
+        n_frames: Number of frames to sample (1-100)
+        profile: Verification profile (strict/balanced/lenient)
+        sample_strategy: Sampling strategy (uniform/keyframes/stride)
+        export_artifacts: Whether to export BER CSV and plot
+    
+    Returns:
+        {"valid": bool, "ber": float, "summary": str, "artifacts": dict}
+    
+    Example:
+        curl -F "file=@video.mp4" -F "secret_hex=abc123" http://localhost:8000/verify
     """
+    
+    # Validate inputs
+    validate_file_upload(file)
+    if not (1 <= n_frames <= 100):
+        raise HTTPException(status_code=400, detail="n_frames must be between 1 and 100")
+    
+    thresholds = get_profile_thresholds(profile)
+    start_time = time.time()
     # Save upload to temp file
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-            tmp.write(await file.read())
+            content = await file.read()
+            tmp.write(content)
             tmp_path = tmp.name
+        logger.info(f"Uploaded file saved: {len(content)} bytes")
     except Exception as e:
         logger.error(f"Failed to save upload: {e}")
+        REQUESTS_TOTAL.labels(status="error").inc()
         raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
 
     # Get secret
@@ -93,6 +196,7 @@ async def verify(
     except Exception as e:
         os.remove(tmp_path)
         logger.error(f"Secret error: {e}")
+        REQUESTS_TOTAL.labels(status="error").inc()
         raise HTTPException(status_code=400, detail=f"Secret error: {e}")
 
     # Sample N evenly spaced frames using ffmpeg
@@ -132,6 +236,8 @@ async def verify(
             raise Exception("No frames extracted.")
     except Exception as e:
         os.remove(tmp_path)
+        logger.error(f"Frame extraction failed: {e}")
+        REQUESTS_TOTAL.labels(status="error").inc()
         raise HTTPException(status_code=500, detail=f"Frame extraction failed: {e}")
 
     # Load frames, preprocess, and stack
@@ -162,7 +268,11 @@ async def verify(
             # Majority vote across frames
             rec_bits = (np.sum(bits, axis=0) > (len(bits)//2)).astype(np.uint8)
             ber = float(np.mean(rec_bits != secret))
-            valid = ber < 0.1
+            valid = ber < thresholds["pass"]
+            
+            # Update metrics
+            AVG_BER.observe(ber)
+            REQUESTS_TOTAL.labels(status="success").inc()
             # --- Enhanced video analysis: pass BER for tamper localization ---
             analysis_report = analyze_frames(batch_tensor, per_frame_ber=per_frame_ber)
             logger.info(f"Frame analysis: {analysis_report}")
@@ -170,36 +280,61 @@ async def verify(
                 logger.warning(f"Likely tampered frames: {analysis_report['tampered_frames']}")
         except Exception as e:
             os.remove(tmp_path)
+            logger.error(f"Decode failed: {e}")
+            REQUESTS_TOTAL.labels(status="error").inc()
             raise HTTPException(status_code=500, detail=f"Decode failed: {e}")
     except Exception as e:
         os.remove(tmp_path)
+        logger.error(f"Frame loading failed: {e}")
+        REQUESTS_TOTAL.labels(status="error").inc()
         raise HTTPException(status_code=500, detail=f"Frame loading failed: {e}")
 
+    # Generate summary
+    summary = format_summary(valid, ber, per_frame_ber.tolist(), thresholds)
+    
+    # Export artifacts if requested
+    artifacts = {}
+    if export_artifacts:
+        try:
+            csv_path, png_path = save_ber_artifacts(per_frame_ber.tolist())
+            # Read and encode artifacts
+            with open(csv_path, 'r') as f:
+                artifacts['ber_csv'] = base64.b64encode(f.read().encode()).decode()
+            with open(png_path, 'rb') as f:
+                artifacts['ber_png'] = base64.b64encode(f.read()).decode()
+            # Cleanup artifact files
+            os.remove(csv_path)
+            os.remove(png_path)
+        except Exception as e:
+            logger.warning(f"Failed to export artifacts: {e}")
+    
     # Cleanup
     os.remove(tmp_path)
     for f in frame_files:
         os.remove(f)
     os.rmdir(frames_dir)
+    
+    duration = time.time() - start_time
+    logger.info(f"Verification completed in {duration:.2f}s: {summary}")
 
-    return JSONResponse({"valid": valid, "ber": ber})
+    return JSONResponse({
+        "valid": valid, 
+        "ber": ber,
+        "summary": summary,
+        "per_frame_ber": per_frame_ber.tolist(),
+        "thresholds": thresholds,
+        "artifacts": artifacts,
+        "processing_time": duration
+    })
 
-def generate_test_video(path, num_frames=20, size=256, fps=10):
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(path, fourcc, fps, (size, size))
-    for i in range(num_frames):
-        img = np.zeros((size, size, 3), dtype=np.uint8)
-        img[:, :size//3] = (255, 0, 0)
-        img[:, size//3:2*size//3] = (0, 255, 0)
-        img[:, 2*size//3:] = (0, 0, 255)
-        img = np.roll(img, i*5, axis=1)
-        out.write(img)
-    out.release()
+# Moved to test utilities
 
-generate_test_video("test_video.mp4")
-
-with open("watermarked.mp4", "rb") as f:
-    files = {"file": ("video.mp4", f, "video/mp4")}
-    data = {"secret_hex": "ffeeddccbbaa99887766554433221100", "n_frames": 8}
-    resp = requests.post("http://127.0.0.1:8000/verify", files=files, data=data)
-    print(resp.status_code)
-    print(resp.json())
+# Remove test code - should be in separate test file
+# generate_test_video("test_video.mp4")
+# 
+# with open("watermarked.mp4", "rb") as f:
+#     files = {"file": ("video.mp4", f, "video/mp4")}
+#     data = {"secret_hex": "ffeeddccbbaa99887766554433221100", "n_frames": 8}
+#     resp = requests.post("http://127.0.0.1:8000/verify", files=files, data=data)
+#     print(resp.status_code)
+#     print(resp.json())
