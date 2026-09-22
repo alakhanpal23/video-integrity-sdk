@@ -1,56 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="590" viewBox="0 0 1200 590" role="img" aria-labelledby="title desc">
-<title id="title">Embed, transform, then measure</title>
-<desc id="desc">Python and FFmpeg watermarking with verification artifacts</desc>
-<rect width="1200" height="590" rx="28" fill="#071521"/>
-<rect x="1" y="1" width="1198" height="588" rx="27" fill="none" stroke="#254256" stroke-width="2"/>
-<rect x="52" y="46" width="8" height="42" rx="4" fill="#7cc9ff"/>
-<text x="77" y="67" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">VIDEO INTEGRITY SDK  /  SYSTEM DESIGN</text>
-<text x="52" y="120" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="37" font-weight="700">Embed, transform, then measure</text>
-<text x="52" y="154" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="19">Python and FFmpeg watermarking with verification artifacts</text>
-<rect x="52" y="211" width="208" height="224" rx="18" fill="#102637" stroke="#2d4b5d" stroke-width="2"/>
-<circle cx="82" cy="244" r="15" fill="#7cc9ff" opacity=".18"/>
-<text x="82" y="250" text-anchor="middle" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">01</text>
-<text x="72" y="295" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.4">INPUT</text>
-<rect x="72" y="315" width="168" height="1" fill="#315469"/>
-<text x="72" y="357" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="19">Source video</text>
-<text x="72" y="388" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="17">Watermark secret</text>
-<path d="M 269 323 H 280" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round"/>
-<path d="M 275 317 L 282 323 L 275 329" fill="none" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="284" y="211" width="208" height="224" rx="18" fill="#102637" stroke="#2d4b5d" stroke-width="2"/>
-<circle cx="314" cy="244" r="15" fill="#7cc9ff" opacity=".18"/>
-<text x="314" y="250" text-anchor="middle" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">02</text>
-<text x="304" y="295" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.4">EMBED</text>
-<rect x="304" y="315" width="168" height="1" fill="#315469"/>
-<text x="304" y="357" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="19">CNN encoder</text>
-<text x="304" y="388" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="17">Frame pipeline</text>
-<path d="M 501 323 H 512" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round"/>
-<path d="M 507 317 L 514 323 L 507 329" fill="none" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="516" y="211" width="208" height="224" rx="18" fill="#102637" stroke="#2d4b5d" stroke-width="2"/>
-<circle cx="546" cy="244" r="15" fill="#7cc9ff" opacity=".18"/>
-<text x="546" y="250" text-anchor="middle" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">03</text>
-<text x="536" y="295" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.4">PROCESS</text>
-<rect x="536" y="315" width="168" height="1" fill="#315469"/>
-<text x="536" y="357" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="19">FFmpeg output</text>
-<text x="536" y="388" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="17">Codec presets</text>
-<path d="M 733 323 H 744" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round"/>
-<path d="M 739 317 L 746 323 L 739 329" fill="none" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="748" y="211" width="208" height="224" rx="18" fill="#102637" stroke="#2d4b5d" stroke-width="2"/>
-<circle cx="778" cy="244" r="15" fill="#7cc9ff" opacity=".18"/>
-<text x="778" y="250" text-anchor="middle" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">04</text>
-<text x="768" y="295" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.4">TEST</text>
-<rect x="768" y="315" width="168" height="1" fill="#315469"/>
-<text x="768" y="357" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="19">Re-encode / scale</text>
-<text x="768" y="388" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="17">Selected attacks</text>
-<path d="M 965 323 H 976" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round"/>
-<path d="M 971 317 L 978 323 L 971 329" fill="none" stroke="#7cc9ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="980" y="211" width="208" height="224" rx="18" fill="#102637" stroke="#2d4b5d" stroke-width="2"/>
-<circle cx="1010" cy="244" r="15" fill="#7cc9ff" opacity=".18"/>
-<text x="1010" y="250" text-anchor="middle" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700">05</text>
-<text x="1000" y="295" fill="#7cc9ff" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.4">VERIFY</text>
-<rect x="1000" y="315" width="168" height="1" fill="#315469"/>
-<text x="1000" y="357" fill="#f1f7fb" font-family="Arial, Helvetica, sans-serif" font-size="19">Decoder + BER</text>
-<text x="1000" y="388" fill="#a9bfcb" font-family="Arial, Helvetica, sans-serif" font-size="17">Timeline report</text>
-<rect x="52" y="474" width="1096" height="65" rx="13" fill="#112d3c" stroke="#2d4b5d"/>
-<circle cx="78" cy="507" r="6" fill="#7cc9ff"/>
-<text x="98" y="514" fill="#d8e9ef" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="600">INTERFACES   •   CLI  /  Python API  /  JavaScript client  /  HTTP API</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+<title id="title">Video Integrity SDK — system diagram</title>
+<desc id="desc">Video frames and a secret pass through watermark embedding and FFmpeg; transformed video is decoded and measured with bit error rate.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 9 4.5 L 0 9" fill="none" stroke="#465768" stroke-width="1.5"/></marker></defs>
+<rect width="1200" height="640" fill="#ffffff"/>
+<text x="40" y="52" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#172b3a">Video Integrity SDK — system diagram</text>
+<path d="M 40 69 H 1160" stroke="#d5dce2" stroke-width="1"/>
+<rect x="45" y="165" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="140.0" y="204.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Source video</text>
+<text x="140.0" y="229.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">secret bits</text>
+<rect x="285" y="165" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="380.0" y="204.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Encoder</text>
+<text x="380.0" y="229.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">watermark frames</text>
+<rect x="525" y="165" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="620.0" y="204.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">FFmpeg</text>
+<text x="620.0" y="229.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">encode video</text>
+<rect x="765" y="165" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="860.0" y="204.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Watermarked</text>
+<text x="860.0" y="229.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">video file</text>
+<path d="M 235 207 L 285 207" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="285,207 274.0,212.0 274.0,202.0" fill="#465768"/>
+<path d="M 475 207 L 525 207" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="525,207 514.0,212.0 514.0,202.0" fill="#465768"/>
+<path d="M 715 207 L 765 207" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="765,207 754.0,212.0 754.0,202.0" fill="#465768"/>
+<rect x="765" y="365" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="860.0" y="404.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Optional test</text>
+<text x="860.0" y="429.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">re-encode / scale</text>
+<rect x="525" y="365" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="620.0" y="404.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Decoder</text>
+<text x="620.0" y="429.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">recover bits</text>
+<rect x="285" y="365" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="380.0" y="404.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">BER analysis</text>
+<text x="380.0" y="429.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">timeline / thresholds</text>
+<rect x="45" y="365" width="190" height="85" fill="#ffffff" stroke="#465768" stroke-width="1.7"/>
+<text x="140.0" y="404.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#172b3a">Result</text>
+<text x="140.0" y="429.5" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">summary + artifacts</text>
+<path d="M 860 250 L 860 365" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="860,365 855.0,354.0 865.0,354.0" fill="#465768"/>
+<path d="M 765 407 L 715 407" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="715,407 726.0,402.0 726.0,412.0" fill="#465768"/>
+<path d="M 525 407 L 475 407" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="475,407 486.0,402.0 486.0,412.0" fill="#465768"/>
+<path d="M 285 407 L 235 407" fill="none" stroke="#465768" stroke-width="1.8"/>
+<polygon points="235,407 246.0,402.0 246.0,412.0" fill="#465768"/>
+<text x="45" y="535" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">Entry points: CLI · Python API · JavaScript client · HTTP API</text>
+<text x="45" y="565" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#536777">Verification reports observed bit errors; robustness depends on the footage and transformations tested.</text>
 </svg>
