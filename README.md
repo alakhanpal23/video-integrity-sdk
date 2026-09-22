@@ -5,7 +5,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://hub.docker.com)
 
-A production-ready Python/FFmpeg-based SDK to embed and verify imperceptible watermarks in video streams for integrity verification.
+A Python and FFmpeg project for embedding watermarks in video and measuring whether they survive selected transformations. It includes a CLI, API, JavaScript client, and tests. Its reliability for a particular codec, attack, or deployment should be measured with representative footage before use in an integrity decision.
 
 ## 🚀 Run in 60 Seconds
 
@@ -26,7 +26,7 @@ make demo
 
 - 🔐 **CNN-based watermarking** - Imperceptible, compression-resistant
 - 📊 **BER analysis** - Timeline plots and tamper localization  
-- 🚀 **Production ready** - Health checks, metrics, monitoring
+- 🚀 **Operational interfaces** - Health checks, metrics, monitoring
 - 🌐 **Multi-language** - Python API + JavaScript SDK
 - ⚡ **Quick presets** - `--preset reencode_light|heavy|social`
 - 🎯 **Flexible profiles** - `--profile strict|balanced|lenient`
@@ -233,4 +233,4 @@ python examples/embed_and_verify.py
 
 ---
 
-**🎉 Ready for production use with comprehensive testing, monitoring, and developer experience!**
+The included tests and demos cover development scenarios. Validate security, error rates, and watermark performance against your own deployment conditions before production use.
