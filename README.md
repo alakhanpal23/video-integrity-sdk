@@ -7,6 +7,10 @@
 
 A Python and FFmpeg project for embedding watermarks in video and measuring whether they survive selected transformations. It includes a CLI, API, JavaScript client, and tests. Its reliability for a particular codec, attack, or deployment should be measured with representative footage before use in an integrity decision.
 
+![Video Integrity SDK system design: embed a watermark, process video with FFmpeg, apply selected transformations, then decode and measure bit error rate](docs/system-design.svg)
+
+*The verifier reports bit error rate and a timeline of potential edits; robustness depends on the tested footage and transformations.*
+
 ## 🚀 Run in 60 Seconds
 
 ```bash
